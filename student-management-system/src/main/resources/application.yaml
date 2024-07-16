@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: student-management-system-service
+  datasource:
+    url: jdbc:oracle:thin:@localhost:1521:xe
+    username: student_system
+    password: password
+  flyway:
+    enabled: true
+    locations: classpath:/db/migration
+  redis:
+    host: localhost
+    port: 6379
+
+server:
+  port: 8000
