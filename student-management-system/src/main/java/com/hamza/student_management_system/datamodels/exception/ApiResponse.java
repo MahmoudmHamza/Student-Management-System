@@ -1,4 +1,4 @@
-package com.hamza.student_management_system.datamodels;
+package com.hamza.student_management_system.datamodels.exception;
 
 import lombok.Builder;
 import lombok.Getter;
