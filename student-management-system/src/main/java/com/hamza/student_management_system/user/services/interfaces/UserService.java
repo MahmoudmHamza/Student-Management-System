@@ -5,6 +5,6 @@ import com.hamza.student_management_system.user.entities.User;
 
 public interface UserService {
     User findUserById(Long id);
-    User createUser(RegisterUserDto userDto);
-    void deleteUser(Long id);
+    User createUser(User user);
+    User deleteUser(Long id);
 }

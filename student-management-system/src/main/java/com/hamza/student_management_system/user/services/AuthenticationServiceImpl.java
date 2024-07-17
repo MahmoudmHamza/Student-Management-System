@@ -6,6 +6,7 @@ import com.hamza.student_management_system.core.security.JwtService;
 import com.hamza.student_management_system.user.datamodels.RegisterUserDto;
 import com.hamza.student_management_system.user.datamodels.UserDto;
 import com.hamza.student_management_system.user.entities.User;
+import com.hamza.student_management_system.user.facade.interfaces.UserFacade;
 import com.hamza.student_management_system.user.services.interfaces.AuthenticationService;
 import com.hamza.student_management_system.user.services.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
@@ -21,9 +22,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-
-    //TODO: replace with user facade
-    private final UserService userService;
+    private final UserFacade userFacade;
 
     @Override
     public AuthResponse authenticate(AuthRequest authRequest) {
@@ -46,13 +45,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public UserDto registerUser(RegisterUserDto userDto) {
-        User fetchedUser = this.userService.createUser(userDto);
-        return UserDto.builder()
-                .username(fetchedUser.getUsername())
-                .email(fetchedUser.getEmail())
-                .firstName(fetchedUser.getFirstName())
-                .lastName(fetchedUser.getLastName())
-                .build();
+        return this.userFacade.addNewUser(userDto);
     }
 
 }

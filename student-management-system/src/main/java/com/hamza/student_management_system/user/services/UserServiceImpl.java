@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private final BCryptPasswordEncoder encoder;
     private final UserRepository userRepository;
 
     @Override
@@ -23,21 +22,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User createUser(RegisterUserDto userDto) {
-        User newUser = User.builder()
-                .username(userDto.getUsername())
-                .passwordHash(encoder.encode(userDto.getPassword()))
-                .firstName(userDto.getFirstName())
-                .lastName(userDto.getLastName())
-                .email(userDto.getEmail())
-                .build();
-
+    public User createUser(User newUser) {
         return userRepository.save(newUser);
     }
 
     @Override
-    public void deleteUser(Long id) {
-        //TODO: check if id exists first
+    public User deleteUser(Long id) {
+        User deletedUser = this.findUserById(id);
         userRepository.deleteById(id);
+
+        return deletedUser;
     }
 }
