@@ -13,12 +13,8 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 @ControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler({Exception.class})
-    public ResponseEntity<ApiErrorResponse> handleException(Exception exception) {
-        ApiErrorResponse response = ApiErrorResponse.builder()
-                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .message(exception.getMessage()).build();
-
-        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<ApiErrorResponse> handleGenericException(Exception exception) {
+        return this.logAndRespond(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
     }
 
     @ExceptionHandler({EntityNotFoundException.class})
