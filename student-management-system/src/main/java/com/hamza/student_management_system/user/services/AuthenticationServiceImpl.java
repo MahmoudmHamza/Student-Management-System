@@ -7,6 +7,7 @@ import com.hamza.student_management_system.user.datamodels.RegisterUserDto;
 import com.hamza.student_management_system.user.datamodels.UserDto;
 import com.hamza.student_management_system.user.entities.User;
 import com.hamza.student_management_system.user.services.interfaces.AuthenticationService;
+import com.hamza.student_management_system.user.services.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,7 +21,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-    private final UserDetailsServiceImpl userService;
+
+    //TODO: replace with user facade
+    private final UserService userService;
 
     @Override
     public AuthResponse authenticate(AuthRequest authRequest) {

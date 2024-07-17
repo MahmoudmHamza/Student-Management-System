@@ -15,29 +15,9 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class UserDetailsServiceImpl implements UserDetailsService, UserService {
+public class UserDetailsServiceImpl implements UserDetailsService {
 
-    private final BCryptPasswordEncoder encoder;
     private final UserRepository userRepository;
-
-    @Override
-    public User findUserById(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Can't find user with id: " +  id));
-    }
-
-    @Override
-    public User createUser(RegisterUserDto userDto) {
-        User newUser = User.builder()
-                .username(userDto.getUsername())
-                .passwordHash(encoder.encode(userDto.getPassword()))
-                .firstName(userDto.getFirstName())
-                .lastName(userDto.getLastName())
-                .email(userDto.getEmail())
-                .build();
-
-        return userRepository.save(newUser);
-    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -46,9 +26,4 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
         return new UserDetailsInfo(user);
     }
 
-    @Override
-    public void deleteUser(Long id) {
-        //TODO: check if id exists first
-        userRepository.deleteById(id);
-    }
 }
