@@ -8,4 +8,6 @@ public interface CourseFacade {
     List<CourseDto> findAll();
     List<CourseDto> findAllByUserId();
     CourseDto findById(Long id);
+    CourseDto registerCourse(Long courseId);
+    CourseDto cancelCourseRegistration(Long courseId);
 }

@@ -8,6 +8,7 @@ public interface CourseService {
     List<Course> findAllCourses();
     List<Course> findCoursesByUserId();
     Course findCourseById(Long id);
-    Course addNewCourse(Long userId, Course newProduct);
-    Course removeCourse(Long userId, Long id);
+
+    Course registerCourse(Long courseId);
+    Course cancelCourseRegistration(Long courseId);
 }

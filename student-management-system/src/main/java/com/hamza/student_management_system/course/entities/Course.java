@@ -31,6 +31,6 @@ public class Course {
     private int credits;
 
     @Column(name = "schedule")
-    private String schedule;
+    private byte[] schedule;
 
 }

@@ -34,4 +34,14 @@ public class CourseFacadeImpl implements CourseFacade {
     public CourseDto findById(Long id) {
         return this.courseMapper.mapCourseToCourseDto(this.courseService.findCourseById(id));
     }
+
+    @Override
+    public CourseDto registerCourse(Long courseId) {
+        return this.courseMapper.mapCourseToCourseDto(this.courseService.registerCourse(courseId));
+    }
+
+    @Override
+    public CourseDto cancelCourseRegistration(Long courseId) {
+        return this.courseMapper.mapCourseToCourseDto(this.courseService.cancelCourseRegistration(courseId));
+    }
 }

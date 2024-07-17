@@ -1,40 +1,40 @@
 package com.hamza.student_management_system.course.services;
 
+import com.hamza.student_management_system.core.exceptions.CourseRegistrationException;
 import com.hamza.student_management_system.course.entities.Course;
+import com.hamza.student_management_system.course.entities.Registration;
 import com.hamza.student_management_system.course.repositories.CourseRepository;
 import com.hamza.student_management_system.course.repositories.RegistrationRepository;
 import com.hamza.student_management_system.course.services.interfaces.CourseService;
 import com.hamza.student_management_system.user.entities.User;
 import com.hamza.student_management_system.user.repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class CourseServiceImpl implements CourseService {
 
     private final CourseRepository courseRepository;
-    private final RegistrationRepository registrationRepository;
     private final UserRepository userRepository;
+    private final RegistrationRepository registrationRepository;
 
     @Override
     public List<Course> findAllCourses() {
-        return courseRepository.findAll();
+        return this.courseRepository.findAll();
     }
 
     @Override
     public List<Course> findCoursesByUserId() {
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = this.userRepository.findByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new EntityNotFoundException("Can't find user with name: " + userDetails.getUsername()));
-
-        return registrationRepository.findCoursesByUserId(user.getId());
+        User user = getAuthenticatedUserDetails();
+        return this.registrationRepository.findCoursesByUserId(user.getId());
     }
 
     @Override
@@ -43,15 +43,47 @@ public class CourseServiceImpl implements CourseService {
                 .orElseThrow(() -> new EntityNotFoundException("Couldn't find user courses for user of id: " + id));
     }
 
-    //TODO: implement later
     @Override
-    public Course addNewCourse(Long userId, Course newProduct) {
-        return null;
+    @Transactional
+    public Course registerCourse(Long courseId) {
+        User user = getAuthenticatedUserDetails();
+        Course course = this.findCourseById(courseId);
+
+        if (this.isCourseRegistered(user, course)) {
+            throw new CourseRegistrationException("User is already registered to course: " + course.getCourseName());
+        }
+
+        Registration courseRegistration = Registration.builder()
+                .user(user)
+                .course(course)
+                .build();
+
+        this.registrationRepository.save(courseRegistration);
+        return course;
     }
 
-    //TODO: implement later
     @Override
-    public Course removeCourse(Long userId, Long id) {
-        return null;
+    @Transactional
+    public Course cancelCourseRegistration(Long courseId) {
+        User user = getAuthenticatedUserDetails();
+        Course course = this.findCourseById(courseId);
+
+        if (!this.isCourseRegistered(user, course)) {
+            throw new CourseRegistrationException("User is not registered to course: " + course.getCourseName());
+        }
+
+        this.registrationRepository.updateCourseRegistrationStatus(user.getId(), courseId);
+        return course;
+    }
+
+    private User getAuthenticatedUserDetails() {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return this.userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new EntityNotFoundException("Can't find user with name: " + userDetails.getUsername()));
+    }
+
+    private boolean isCourseRegistered(User user, Course course) {
+        Optional<Registration> registration = this.registrationRepository.findByUserId(user.getId());
+        return registration.isPresent() && registration.get().getStatus().equals("REGISTERED");
     }
 }
