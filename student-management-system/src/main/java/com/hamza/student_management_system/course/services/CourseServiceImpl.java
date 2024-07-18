@@ -32,13 +32,13 @@ public class CourseServiceImpl implements CourseService {
     private final PdfGenerator pdfGenerator;
 
     @Override
-    @Cacheable("coursesList")
+    @Cacheable(value = "coursesList")
     public List<Course> findAllCourses() {
         return this.courseRepository.findAll();
     }
 
     @Override
-    @Cacheable(value = "userCourses", key = "#userId")
+    @Cacheable(value = "userCourses")
     public List<Course> findCoursesByUserId() {
         User user = getAuthenticatedUserDetails();
         return this.registrationRepository.findCoursesByUserId(user.getId());
@@ -58,7 +58,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     @Transactional
-    @CacheEvict(value = "userCourses", key = "#userId")
+    @CacheEvict(value = "userCourses")
     public Course registerCourse(Long courseId) {
         User user = getAuthenticatedUserDetails();
         Course course = this.findCourseById(courseId);
@@ -78,7 +78,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     @Transactional
-    @CacheEvict(value = "userCourses", key = "#userId")
+    @CacheEvict(value = "userCourses")
     public Course cancelCourseRegistration(Long courseId) {
         User user = getAuthenticatedUserDetails();
         Course course = this.findCourseById(courseId);
