@@ -30,7 +30,8 @@ public class Course {
     @Column(name = "credits")
     private int credits;
 
+    @Lob
     @Column(name = "schedule")
-    private byte[] schedule;
+    private String schedule;
 
 }

@@ -25,7 +25,7 @@ CREATE TABLE registrations (
     user_id NUMBER NOT NULL,
     course_id NUMBER NOT NULL,
     registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    status VARCHAR2(10) CHECK (status IN ('REGISTERED', 'CANCELLED')) NOT NULL,
+    version NUMBER(10) NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (course_id) REFERENCES courses(id)
 );
@@ -36,11 +36,11 @@ CREATE INDEX idx_registrations_course_id ON registrations(course_id);
 
 -- Insert Test Data into Users Table
 INSERT INTO users (username, password_hash, email, first_name, last_name, role)
-VALUES ('student1', 'password1', 'student1@example.com', 'Medhat', 'Hamza', 'STUDENT');
+VALUES ('student1', '$2a$12$wXgubrUMgyBHyWWxPQvLI.JjXQvd1Y0BWmaDVTRj3p4ImDCcg3oZy', 'student1@example.com', 'Medhat', 'Hamza', 'STUDENT');
 INSERT INTO users (username, password_hash, email, first_name, last_name, role)
-VALUES ('student2', 'password2', 'student2@example.com', 'Abdelrahman', 'Hamza', 'STUDENT');
+VALUES ('student2', '$2a$12$ewL6p1EIZbXiU5oBdNT8VO0BAvFE/7mYsCK.f4/XRfJt9SE/C5fOe', 'student2@example.com', 'Abdelrahman', 'Hamza', 'STUDENT');
 INSERT INTO users (username, password_hash, email, first_name, last_name, role)
-VALUES ('admin', 'admin', 'admin1@example.com', 'Mahmoud', 'Hamza', 'ADMIN');
+VALUES ('admin', '$2a$12$3gul4/xln6/JEm1yAjK31uxpxfvMvFmYflRIUWK.ZvK3xAxk1OFtC', 'admin1@example.com', 'Mahmoud', 'Hamza', 'ADMIN');
 
 -- Insert Test Data into Courses Table
 INSERT INTO courses (course_code, course_name, description, credits, schedule)
@@ -49,9 +49,9 @@ INSERT INTO courses (course_code, course_name, description, credits, schedule)
 VALUES ('MATH201', 'Calculus I', 'Introduction to calculus', 4, '{"Tuesday": "09:00-11:00", "Thursday": "09:00-11:00"}');
 
 -- Insert Test Data into Registrations Table
-INSERT INTO registrations (user_id, course_id, registration_date, status)
-VALUES (1, 1, SYSTIMESTAMP, 'REGISTERED');
-INSERT INTO registrations (user_id, course_id, registration_date, status)
-VALUES (2, 1, SYSTIMESTAMP, 'REGISTERED');
-INSERT INTO registrations (user_id, course_id, registration_date, status)
-VALUES (1, 2, SYSTIMESTAMP, 'REGISTERED');
+INSERT INTO registrations (user_id, course_id, registration_date, version)
+VALUES (1, 1, SYSTIMESTAMP, 0);
+INSERT INTO registrations (user_id, course_id, registration_date, version)
+VALUES (2, 1, SYSTIMESTAMP, 0);
+INSERT INTO registrations (user_id, course_id, registration_date, version)
+VALUES (1, 2, SYSTIMESTAMP, 0);

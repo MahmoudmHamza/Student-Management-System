@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/api/users")
+@RequestMapping("/v1/users")
 public class UserController {
 
     private final UserFacade userFacade;
