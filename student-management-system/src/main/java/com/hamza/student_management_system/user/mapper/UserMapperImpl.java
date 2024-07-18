@@ -24,7 +24,7 @@ public class UserMapperImpl implements UserMapper {
                 .email(userDto.getEmail())
                 .firstName(userDto.getFirstName())
                 .lastName(userDto.getLastName())
-                .role(UserRoles.Student.name())
+                .role(UserRoles.STUDENT.name())
                 .build();
     }
 

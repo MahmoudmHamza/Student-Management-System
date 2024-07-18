@@ -34,7 +34,8 @@ public class Registration {
     @Column(name = "registration_date", nullable = false)
     private LocalDateTime registrationDate;
 
-    @Column(name = "status", nullable = false)
-    private String status;
+    @Version
+    @Column(name = "version", nullable = false)
+    private int version;
 
 }

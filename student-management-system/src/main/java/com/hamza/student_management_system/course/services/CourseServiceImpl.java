@@ -1,6 +1,7 @@
 package com.hamza.student_management_system.course.services;
 
 import com.hamza.student_management_system.core.exceptions.CourseRegistrationException;
+import com.hamza.student_management_system.core.utility.RegistrationStatus;
 import com.hamza.student_management_system.course.entities.Course;
 import com.hamza.student_management_system.course.entities.Registration;
 import com.hamza.student_management_system.course.repositories.CourseRepository;
@@ -16,7 +17,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -49,7 +49,7 @@ public class CourseServiceImpl implements CourseService {
         User user = getAuthenticatedUserDetails();
         Course course = this.findCourseById(courseId);
 
-        if (this.isCourseRegistered(user, course)) {
+        if (this.isCourseRegistered(course)) {
             throw new CourseRegistrationException("User is already registered to course: " + course.getCourseName());
         }
 
@@ -68,11 +68,11 @@ public class CourseServiceImpl implements CourseService {
         User user = getAuthenticatedUserDetails();
         Course course = this.findCourseById(courseId);
 
-        if (!this.isCourseRegistered(user, course)) {
+        if (!this.isCourseRegistered(course)) {
             throw new CourseRegistrationException("User is not registered to course: " + course.getCourseName());
         }
 
-        this.registrationRepository.updateCourseRegistrationStatus(user.getId(), courseId);
+        this.registrationRepository.deleteByUserIdAndCourseId(user.getId(), courseId);
         return course;
     }
 
@@ -82,8 +82,9 @@ public class CourseServiceImpl implements CourseService {
                 .orElseThrow(() -> new EntityNotFoundException("Can't find user with name: " + userDetails.getUsername()));
     }
 
-    private boolean isCourseRegistered(User user, Course course) {
-        Optional<Registration> registration = this.registrationRepository.findByUserId(user.getId());
-        return registration.isPresent() && registration.get().getStatus().equals("REGISTERED");
+    private boolean isCourseRegistered(Course course) {
+        List<Course> registeredCourses = this.findCoursesByUserId();
+        //TODO: test this
+        return registeredCourses.contains(course);
     }
 }
