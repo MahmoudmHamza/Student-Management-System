@@ -1,5 +1,7 @@
 package com.hamza.student_management_system.core.security;
 
+import com.hamza.student_management_system.core.exceptions.UnauthorizedException;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,14 +30,20 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String token = null;
         String userName = null;
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            token = authHeader.substring(7);
-            userName = jwtService.extractUserNameFromToken(token);
+        try {
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                token = authHeader.substring(7);
+                userName = jwtService.extractUserNameFromToken(token);
+            }
+        } catch (Exception e) {
+            throw new UnauthorizedException("Not authorized user due to invalid token!");
         }
 
         if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
-            if(jwtService.validateToken(token, userDetails)){
+            if (!jwtService.validateToken(token, userDetails)) {
+                throw new UnauthorizedException("Not authorized user due to invalid token!");
+            } else {
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 

@@ -1,7 +1,7 @@
 package com.hamza.student_management_system.course.services;
 
 import com.hamza.student_management_system.core.exceptions.CourseRegistrationException;
-import com.hamza.student_management_system.core.utility.RegistrationStatus;
+import com.hamza.student_management_system.core.utility.PdfGenerator;
 import com.hamza.student_management_system.course.entities.Course;
 import com.hamza.student_management_system.course.entities.Registration;
 import com.hamza.student_management_system.course.repositories.CourseRepository;
@@ -10,12 +10,14 @@ import com.hamza.student_management_system.course.services.interfaces.CourseServ
 import com.hamza.student_management_system.user.entities.User;
 import com.hamza.student_management_system.user.repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -25,6 +27,7 @@ public class CourseServiceImpl implements CourseService {
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
     private final RegistrationRepository registrationRepository;
+    private final PdfGenerator pdfGenerator;
 
     @Override
     public List<Course> findAllCourses() {
@@ -41,6 +44,12 @@ public class CourseServiceImpl implements CourseService {
     public Course findCourseById(Long id) {
         return this.courseRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Couldn't find user courses for user of id: " + id));
+    }
+
+    @Override
+    public void getCourseSchedulePdf(HttpServletResponse response, Long courseId) throws IOException {
+        Course course = this.findCourseById(courseId);
+        this.pdfGenerator.generateCourseSchedulePdf(response, course);
     }
 
     @Override

@@ -2,14 +2,16 @@ package com.hamza.student_management_system.course.controllers;
 
 import com.hamza.student_management_system.course.datamodels.CourseDto;
 import com.hamza.student_management_system.course.facade.interfaces.CourseFacade;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/v1/courses")
+@RequestMapping("/v1/api/courses")
 @RequiredArgsConstructor
 public class CourseController {
 
@@ -42,8 +44,9 @@ public class CourseController {
         return ResponseEntity.ok(this.courseFacade.cancelCourseRegistration(courseId));
     }
 
-//    @GetMapping("/schedules/{courseId}/pdf")
-//    public ResponseEntity<CourseDto> getCourseSchedule(@PathVariable Long courseId) throws IOException {
-//
-//    }
+    @GetMapping("/schedule/{courseId}/pdf")
+    public ResponseEntity<?> getCourseSchedule(HttpServletResponse response, @PathVariable Long courseId) throws IOException {
+        this.courseFacade.getCourseSchedulePdf(response, courseId);
+        return ResponseEntity.status(200).body("Course Schedule PDF generated successfully");
+    }
 }

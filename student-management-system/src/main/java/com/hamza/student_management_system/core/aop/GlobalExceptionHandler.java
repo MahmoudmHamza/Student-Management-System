@@ -2,6 +2,8 @@ package com.hamza.student_management_system.core.aop;
 
 import com.hamza.student_management_system.core.exceptions.ApiErrorResponse;
 import com.hamza.student_management_system.core.exceptions.CourseRegistrationException;
+import com.hamza.student_management_system.core.exceptions.UnauthorizedException;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({EntityNotFoundException.class})
     public ResponseEntity<ApiErrorResponse> handleEntityNotFoundException(EntityNotFoundException exception) {
         return this.logAndRespond(HttpStatus.NOT_FOUND, exception.getMessage());
+    }
+
+    @ExceptionHandler({UnauthorizedException.class})
+    public ResponseEntity<ApiErrorResponse> handleNotAuthorizedException(UnauthorizedException exception) {
+        return this.logAndRespond(HttpStatus.UNAUTHORIZED, exception.getMessage());
+    }
+
+    @ExceptionHandler({ExpiredJwtException.class})
+    public ResponseEntity<ApiErrorResponse> handleExpiredJwtException(ExpiredJwtException exception) {
+        return this.logAndRespond(HttpStatus.UNAUTHORIZED, exception.getMessage());
     }
 
     @ExceptionHandler(NullPointerException.class)
@@ -49,7 +61,11 @@ public class GlobalExceptionHandler {
 
     private ResponseEntity<ApiErrorResponse> logAndRespond(HttpStatus httpStatus, String message) {
 //        log.error("Caught an error with the message: {}", message);
-        ApiErrorResponse error = ApiErrorResponse.builder().status(httpStatus.value()).message(message).build();
+        ApiErrorResponse error = ApiErrorResponse.builder()
+                .status(httpStatus.value())
+                .message(message)
+                .build();
+
         return new ResponseEntity<>(error, httpStatus);
     }
 }

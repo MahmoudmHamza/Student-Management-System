@@ -43,6 +43,7 @@ public class SecurityConfig {
                         auth -> auth.requestMatchers(
                                         "/v1/api/auth/register",
                                         "/v1/api/auth/login",
+                                        "/v1/api/auth/refresh",
                                         "/swagger*/**",
                                         "/v3/api-docs/**"
                                 ).permitAll()

@@ -1,4 +1,4 @@
-package com.hamza.student_management_system.core.security.models;
+package com.hamza.student_management_system.core.security.requests;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

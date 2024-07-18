@@ -1,5 +1,6 @@
 package com.hamza.student_management_system.core.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -18,25 +19,41 @@ import java.util.function.Function;
 @Component
 public class JwtService {
 
-    public static final String SECRET = "P2K5063E3Y6tpPCBMdyZxQ1ijvrnOnmNPxwc52efZIxFD2AvKbe61sHMOaJO2efZIxFD2AvKbe61sHMOaJO";
+    @Value("${jwt.secret}")
+    private String secret;
 
-    public String generateToken(String userName) {
+    @Value("${jwt.expiration}")
+    private long expirationTime;
+
+    @Value("${jwt.refreshExpiration}")
+    private long refreshExpirationTime;
+
+    public String generateToken(String username) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("username", userName);
+        return createToken(claims, username, expirationTime);
+    }
+
+    public String generateRefreshToken(String username) {
+        Map<String, Object> claims = new HashMap<>();
+        return createToken(claims, username, refreshExpirationTime);
+    }
+
+    private String createToken(Map<String, Object> claims, String username, long expiration) {
+        claims.put("username", username);
         Instant now = Instant.now();
 
         return Jwts.builder()
                 .claims(claims)
-                .subject(userName)
+                .subject(username)
                 .issuer("Hamza")
                 .issuedAt(Date.from(now))
-                .expiration(Date.from(now.plusMillis(300000))) //move to properties
+                .expiration(Date.from(now.plusMillis(expiration)))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
     }
 
     public String extractUserNameFromToken(String token) {
         Claims claims = Jwts.parser()
-                .setSigningKey(SECRET)
+                .setSigningKey(secret)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
@@ -45,7 +62,7 @@ public class JwtService {
     }
 
     private Key getSignKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET);
+        byte[] keyBytes = Decoders.BASE64.decode(secret);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 

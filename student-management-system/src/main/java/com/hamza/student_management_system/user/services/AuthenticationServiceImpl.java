@@ -1,14 +1,13 @@
 package com.hamza.student_management_system.user.services;
 
-import com.hamza.student_management_system.core.security.models.AuthRequest;
-import com.hamza.student_management_system.core.security.models.AuthResponse;
+import com.hamza.student_management_system.core.security.requests.AuthRequest;
+import com.hamza.student_management_system.core.security.requests.AuthResponse;
 import com.hamza.student_management_system.core.security.JwtService;
+import com.hamza.student_management_system.core.security.requests.RefreshAuthRequest;
 import com.hamza.student_management_system.user.datamodels.RegisterUserDto;
 import com.hamza.student_management_system.user.datamodels.UserDto;
-import com.hamza.student_management_system.user.entities.User;
 import com.hamza.student_management_system.user.facade.interfaces.UserFacade;
 import com.hamza.student_management_system.user.services.interfaces.AuthenticationService;
-import com.hamza.student_management_system.user.services.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,6 +21,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+
     private final UserFacade userFacade;
 
     @Override
@@ -39,8 +39,26 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             return AuthResponse.builder()
                     .username(authRequest.getUsername())
                     .token(jwtService.generateToken(authRequest.getUsername()))
+                    .refreshToken(jwtService.generateRefreshToken(authRequest.getUsername()))
                     .build();
         }
+    }
+
+    @Override
+    public AuthResponse generateTokenWithToken(RefreshAuthRequest refreshAuthRequest) {
+
+        String username = jwtService.extractUserNameFromToken(refreshAuthRequest.getRefreshToken());
+
+        //TODO: re visit this
+//        if (!jwtService.validateToken(refreshToken, username)) {
+//            //TODO: throw exception
+//        }
+
+        return AuthResponse.builder()
+                .username(username)
+                .token(jwtService.generateToken(username))
+                .refreshToken(jwtService.generateRefreshToken(username))
+                .build();
     }
 
     @Override

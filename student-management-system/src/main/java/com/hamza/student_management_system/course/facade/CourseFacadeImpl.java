@@ -4,9 +4,11 @@ import com.hamza.student_management_system.course.datamodels.CourseDto;
 import com.hamza.student_management_system.course.facade.interfaces.CourseFacade;
 import com.hamza.student_management_system.course.mapper.interfaces.CourseMapper;
 import com.hamza.student_management_system.course.services.interfaces.CourseService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 import lombok.RequiredArgsConstructor;
 
+import java.io.IOException;
 import java.util.List;
 
 @Component
@@ -43,5 +45,10 @@ public class CourseFacadeImpl implements CourseFacade {
     @Override
     public CourseDto cancelCourseRegistration(Long courseId) {
         return this.courseMapper.mapCourseToCourseDto(this.courseService.cancelCourseRegistration(courseId));
+    }
+
+    @Override
+    public void getCourseSchedulePdf(HttpServletResponse response, Long courseId) throws IOException {
+        this.courseService.getCourseSchedulePdf(response, courseId);
     }
 }
