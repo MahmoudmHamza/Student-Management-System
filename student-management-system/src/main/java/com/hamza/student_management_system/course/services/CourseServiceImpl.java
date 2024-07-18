@@ -13,6 +13,8 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -30,11 +32,13 @@ public class CourseServiceImpl implements CourseService {
     private final PdfGenerator pdfGenerator;
 
     @Override
+    @Cacheable("coursesList")
     public List<Course> findAllCourses() {
         return this.courseRepository.findAll();
     }
 
     @Override
+    @Cacheable(value = "userCourses", key = "#userId")
     public List<Course> findCoursesByUserId() {
         User user = getAuthenticatedUserDetails();
         return this.registrationRepository.findCoursesByUserId(user.getId());
@@ -54,6 +58,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "userCourses", key = "#userId")
     public Course registerCourse(Long courseId) {
         User user = getAuthenticatedUserDetails();
         Course course = this.findCourseById(courseId);
@@ -73,6 +78,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "userCourses", key = "#userId")
     public Course cancelCourseRegistration(Long courseId) {
         User user = getAuthenticatedUserDetails();
         Course course = this.findCourseById(courseId);
@@ -91,9 +97,9 @@ public class CourseServiceImpl implements CourseService {
                 .orElseThrow(() -> new EntityNotFoundException("Can't find user with name: " + userDetails.getUsername()));
     }
 
+    //TODO: test this
     private boolean isCourseRegistered(Course course) {
         List<Course> registeredCourses = this.findCoursesByUserId();
-        //TODO: test this
         return registeredCourses.contains(course);
     }
 }

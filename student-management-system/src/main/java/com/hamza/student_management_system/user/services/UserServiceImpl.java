@@ -1,12 +1,11 @@
 package com.hamza.student_management_system.user.services;
 
-import com.hamza.student_management_system.user.datamodels.RegisterUserDto;
 import com.hamza.student_management_system.user.entities.User;
 import com.hamza.student_management_system.user.repositories.UserRepository;
 import com.hamza.student_management_system.user.services.interfaces.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,6 +15,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
+    @Cacheable("userDetails")
     public User findUserById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Can't find user with id: " +  id));
