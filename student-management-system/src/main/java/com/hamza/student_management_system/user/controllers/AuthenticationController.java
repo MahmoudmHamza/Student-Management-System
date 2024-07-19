@@ -2,7 +2,7 @@ package com.hamza.student_management_system.user.controllers;
 
 import com.hamza.student_management_system.core.security.requests.AuthRequest;
 import com.hamza.student_management_system.core.security.requests.AuthResponse;
-import com.hamza.student_management_system.core.security.requests.RefreshAuthRequest;
+import com.hamza.student_management_system.core.security.requests.RefreshTokenRequest;
 import com.hamza.student_management_system.user.datamodels.RegisterUserDto;
 import com.hamza.student_management_system.user.datamodels.UserDto;
 import com.hamza.student_management_system.user.services.interfaces.AuthenticationService;
@@ -30,8 +30,8 @@ public class AuthenticationController {
         return ResponseEntity.ok(authenticationService.authenticate(authRequest));
     }
 
-//    @PostMapping("/refresh")
-//    public ResponseEntity<AuthResponse> refresh(@RequestBody RefreshAuthRequest refreshAuthRequest){
-//        return ResponseEntity.ok(authenticationService.(authRequest));
-//    }
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refresh(@RequestBody RefreshTokenRequest refreshTokenRequest){
+        return ResponseEntity.ok(authenticationService.generateTokenWithToken(refreshTokenRequest));
+    }
 }

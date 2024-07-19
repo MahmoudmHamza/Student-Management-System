@@ -22,4 +22,4 @@ server:
 jwt:
   secret: "P2K5063E3Y6tpPCBMdyZxQ1ijvrnOnmNPxwc52efZIxFD2AvKbe61sHMOaJO2efZIxFD2AvKbe61sHMOaJO"
   expiration: 300000
-  refreshExpiration: 600000
+  refreshExpiration: 330000
