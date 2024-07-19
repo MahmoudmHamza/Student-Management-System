@@ -9,6 +9,8 @@ import com.hamza.student_management_system.user.datamodels.UserDto;
 import com.hamza.student_management_system.user.facade.interfaces.UserFacade;
 import com.hamza.student_management_system.user.services.interfaces.AuthenticationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -25,6 +27,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final UserFacade userFacade;
 
     @Override
+    @CacheEvict(value = {"userCourses", "userDetails"})
     public AuthResponse authenticate(AuthRequest authRequest) {
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -34,7 +37,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         );
 
         if (!auth.isAuthenticated()) {
-            throw new UsernameNotFoundException("Invalid credentials");
+            throw new UsernameNotFoundException("Invalid credentials or token!");
         } else {
             return AuthResponse.builder()
                     .username(authRequest.getUsername())

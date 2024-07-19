@@ -13,6 +13,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,8 +21,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
+@Log4j2
 @Service
 @RequiredArgsConstructor
 public class CourseServiceImpl implements CourseService {
@@ -29,11 +33,13 @@ public class CourseServiceImpl implements CourseService {
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
     private final RegistrationRepository registrationRepository;
+
     private final PdfGenerator pdfGenerator;
 
     @Override
     @Cacheable(value = "coursesList")
     public List<Course> findAllCourses() {
+        log.info("Fetching all available courses");
         return this.courseRepository.findAll();
     }
 
@@ -41,17 +47,20 @@ public class CourseServiceImpl implements CourseService {
     @Cacheable(value = "userCourses")
     public List<Course> findCoursesByUserId() {
         User user = getAuthenticatedUserDetails();
+        log.info(String.format("Fetching registered course for user with id: %s", user.getId()));
         return this.registrationRepository.findCoursesByUserId(user.getId());
     }
 
     @Override
+    @Cacheable(value = "courseDetails", key = "#id")
     public Course findCourseById(Long id) {
         return this.courseRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Couldn't find user courses for user of id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Couldn't find course of id: %s", id)));
     }
 
     @Override
     public void getCourseSchedulePdf(HttpServletResponse response, Long courseId) throws IOException {
+        log.info(String.format("Requesting schedule for course with id: %s", courseId));
         Course course = this.findCourseById(courseId);
         this.pdfGenerator.generateCourseSchedulePdf(response, course);
     }
@@ -63,13 +72,18 @@ public class CourseServiceImpl implements CourseService {
         User user = getAuthenticatedUserDetails();
         Course course = this.findCourseById(courseId);
 
+        log.info(String.format("Requesting student with id %s registration for course with id %s", user.getId(), courseId));
+
         if (this.isCourseRegistered(course)) {
-            throw new CourseRegistrationException("User is already registered to course: " + course.getCourseName());
+            log.error(String.format("Student with id %s is already registered to course with id %s", user.getId(), courseId));
+            throw new CourseRegistrationException(String.format("User is already registered to course: %s", course.getCourseName()));
         }
 
         Registration courseRegistration = Registration.builder()
                 .user(user)
                 .course(course)
+                .registrationDate(LocalDateTime.now())
+                .version(0)
                 .build();
 
         this.registrationRepository.save(courseRegistration);
@@ -79,25 +93,26 @@ public class CourseServiceImpl implements CourseService {
     @Override
     @Transactional
     @CacheEvict(value = "userCourses")
-    public Course cancelCourseRegistration(Long courseId) {
+    public void cancelCourseRegistration(Long courseId) {
         User user = getAuthenticatedUserDetails();
         Course course = this.findCourseById(courseId);
 
+        log.info(String.format("Requesting student with id %d cancel registration for course with id %d", user.getId(), courseId));
+
         if (!this.isCourseRegistered(course)) {
-            throw new CourseRegistrationException("User is not registered to course: " + course.getCourseName());
+            log.error(String.format("Student with id %d is not registered to course with id %d", user.getId(), courseId));
+            throw new CourseRegistrationException(String.format("User is not registered to course: %s", course.getCourseName()));
         }
 
-        this.registrationRepository.deleteByUserIdAndCourseId(user.getId(), courseId);
-        return course;
+        this.registrationRepository.cancelStudentRegistration(user.getId(), courseId);
     }
 
     private User getAuthenticatedUserDetails() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return this.userRepository.findByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new EntityNotFoundException("Can't find user with name: " + userDetails.getUsername()));
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Can't find user with name: %s", userDetails.getUsername())));
     }
 
-    //TODO: test this
     private boolean isCourseRegistered(Course course) {
         List<Course> registeredCourses = this.findCoursesByUserId();
         return registeredCourses.contains(course);

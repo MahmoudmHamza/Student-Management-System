@@ -4,6 +4,7 @@ import com.hamza.student_management_system.course.datamodels.CourseDto;
 import com.hamza.student_management_system.course.facade.interfaces.CourseFacade;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,18 +36,19 @@ public class CourseController {
     }
 
     @PostMapping("/{courseId}/register")
-    public ResponseEntity<CourseDto> registerCourse(@PathVariable Long courseId){
+    public ResponseEntity<CourseDto> registerCourse(@PathVariable Long courseId) {
         return ResponseEntity.ok(this.courseFacade.registerCourse(courseId));
     }
 
     @DeleteMapping("/{courseId}/cancel")
-    public ResponseEntity<CourseDto> cancelCourseRegistration(@PathVariable Long courseId){
-        return ResponseEntity.ok(this.courseFacade.cancelCourseRegistration(courseId));
+    public ResponseEntity<?> cancelCourseRegistration(@PathVariable Long courseId) {
+        this.courseFacade.cancelCourseRegistration(courseId);
+        return ResponseEntity.status(HttpStatus.OK).body("Course registration cancelled successfully");
     }
 
     @GetMapping("/schedule/{courseId}/pdf")
     public ResponseEntity<?> getCourseSchedule(HttpServletResponse response, @PathVariable Long courseId) throws IOException {
         this.courseFacade.getCourseSchedulePdf(response, courseId);
-        return ResponseEntity.status(200).body("Course Schedule PDF generated successfully");
+        return ResponseEntity.status(HttpStatus.OK).body("Course Schedule PDF generated successfully");
     }
 }

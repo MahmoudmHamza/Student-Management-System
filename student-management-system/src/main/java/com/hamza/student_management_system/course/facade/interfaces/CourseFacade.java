@@ -11,6 +11,6 @@ public interface CourseFacade {
     List<CourseDto> findAllByUserId();
     CourseDto findById(Long id);
     CourseDto registerCourse(Long courseId);
-    CourseDto cancelCourseRegistration(Long courseId);
+    void cancelCourseRegistration(Long courseId);
     void getCourseSchedulePdf(HttpServletResponse response, Long courseId) throws IOException;
 }

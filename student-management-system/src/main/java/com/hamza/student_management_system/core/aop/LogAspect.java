@@ -24,12 +24,21 @@ public class LogAspect {
 
     }
 
-    @Around("allUserServices || allUserServices")
-    Object logAround(ProceedingJoinPoint joinPoint) throws Throwable {
+    @Around("allUserServices()")
+    Object logAroundUserService(ProceedingJoinPoint joinPoint) throws Throwable {
         long start = System.currentTimeMillis();
         Object result = joinPoint.proceed();
         long elapsedTime = System.currentTimeMillis() - start;
-        log.info("Method " + joinPoint.getSignature().getName() + " execution time: " + elapsedTime + " milliseconds.");
+        log.info(String.format("Executed method %s execution time: %d milliseconds.", joinPoint.getSignature().getName(), elapsedTime));
+        return result;
+    }
+
+    @Around("allCourseServices()")
+    Object logAroundCourseService(ProceedingJoinPoint joinPoint) throws Throwable {
+        long start = System.currentTimeMillis();
+        Object result = joinPoint.proceed();
+        long elapsedTime = System.currentTimeMillis() - start;
+        log.info(String.format("Executed method %s execution time: %d milliseconds.", joinPoint.getSignature().getName(), elapsedTime));
         return result;
     }
 }

@@ -11,6 +11,6 @@ public interface CourseService {
     List<Course> findCoursesByUserId();
     Course findCourseById(Long id);
     Course registerCourse(Long courseId);
-    Course cancelCourseRegistration(Long courseId);
+    void cancelCourseRegistration(Long courseId);
     void getCourseSchedulePdf(HttpServletResponse response, Long courseId) throws IOException;
 }

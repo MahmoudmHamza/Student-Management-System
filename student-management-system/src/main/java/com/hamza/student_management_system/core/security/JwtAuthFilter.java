@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,6 +18,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+@Log4j2
 @Component
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
@@ -30,20 +32,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String token = null;
         String userName = null;
 
-        try {
-            if (authHeader != null && authHeader.startsWith("Bearer ")) {
-                token = authHeader.substring(7);
-                userName = jwtService.extractUserNameFromToken(token);
-            }
-        } catch (Exception e) {
-            throw new UnauthorizedException("Not authorized user due to invalid token!");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            log.info("Fetching token from incoming request");
+            token = authHeader.substring(7);
+            userName = jwtService.extractUserNameFromToken(token);
         }
 
         if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
-            if (!jwtService.validateToken(token, userDetails)) {
-                throw new UnauthorizedException("Not authorized user due to invalid token!");
-            } else {
+            if (jwtService.validateToken(token, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
@@ -54,5 +51,4 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
-
 }

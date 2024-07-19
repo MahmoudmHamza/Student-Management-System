@@ -43,8 +43,8 @@ public class CourseFacadeImpl implements CourseFacade {
     }
 
     @Override
-    public CourseDto cancelCourseRegistration(Long courseId) {
-        return this.courseMapper.mapCourseToCourseDto(this.courseService.cancelCourseRegistration(courseId));
+    public void cancelCourseRegistration(Long courseId) {
+        this.courseService.cancelCourseRegistration(courseId);
     }
 
     @Override
