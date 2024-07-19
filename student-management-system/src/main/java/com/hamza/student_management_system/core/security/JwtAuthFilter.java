@@ -36,25 +36,21 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String token = null;
         String userName = null;
 
-        try {
-            if (authHeader != null && authHeader.startsWith("Bearer ")) {
-                log.info("Fetching token from incoming request");
-                token = authHeader.substring(7);
-                userName = jwtService.extractUserNameFromToken(token);
-            }
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            log.info("Fetching token from incoming request");
+            token = authHeader.substring(7);
+            userName = jwtService.extractUserNameFromToken(token);
+        }
 
-            if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
-                if (jwtService.validateToken(token, userDetails)) {
-                    UsernamePasswordAuthenticationToken authToken =
-                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
+            if (jwtService.validateToken(token, userDetails)) {
+                UsernamePasswordAuthenticationToken authToken =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
-                }
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authToken);
             }
-        } catch (Exception exception) {
-            throw new UsernameNotFoundException("Invalid credentials!");
         }
 
         filterChain.doFilter(request, response);
