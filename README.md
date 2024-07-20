@@ -39,6 +39,10 @@ git clone https://github.com/MahmoudmHamza/Student-Management-System.git
 4. Build the project.
 5. Run the main application class `StudentManagementSystemApplication.java`.
 
+### API Testing Using Postman Collection
+
+- You will find the postman collection of the exposed endpoints test cases a long with its environment variables located in `postman directory` in the repository.
+
 ### Access Swagger Documentation
 
 Swagger documentation is available for easy API exploration.
@@ -64,10 +68,5 @@ Its developer-friendly API simplifies the process, and as an open-source solutio
 
 - **Redis Caching:** We use Redis for caching to enhance performance and scalability. Redis provides fast in-memory data storage, reducing database load and speeding up data retrieval.
 Redis helps improve user experience by reducing latency and ensuring quick access to frequently accessed data.
-
-### API Testing Using Postman Collection
-
-- You will find the postman collection of the exposed endpoints test cases a long with its environment variables located in `postman directory` in the repository.
-
 
 
