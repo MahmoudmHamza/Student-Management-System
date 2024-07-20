@@ -17,10 +17,16 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    @Cacheable("userDetails")
+    @Cacheable(value = "userDetails", key = "#id")
     public User findUserById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("Can't find user with id: %d", id)));
+    }
+
+    @Override
+    public User findUserByName(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("User with name %s is not found", username)));
     }
 
     @Override

@@ -8,7 +8,7 @@ import com.hamza.student_management_system.course.repositories.CourseRepository;
 import com.hamza.student_management_system.course.repositories.RegistrationRepository;
 import com.hamza.student_management_system.course.services.interfaces.CourseService;
 import com.hamza.student_management_system.user.entities.User;
-import com.hamza.student_management_system.user.repositories.UserRepository;
+import com.hamza.student_management_system.user.services.interfaces.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
@@ -21,7 +21,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -31,7 +30,7 @@ import java.util.List;
 public class CourseServiceImpl implements CourseService {
 
     private final CourseRepository courseRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final RegistrationRepository registrationRepository;
 
     private final PdfGenerator pdfGenerator;
@@ -46,7 +45,7 @@ public class CourseServiceImpl implements CourseService {
     @Override
     @Cacheable(value = "userCourses")
     public List<Course> findCoursesByUserId() {
-        User user = getAuthenticatedUserDetails();
+        User user = this.getAuthenticatedUserDetails();
         log.info(String.format("Fetching registered course for user with id: %s", user.getId()));
         return this.registrationRepository.findCoursesByUserId(user.getId());
     }
@@ -109,8 +108,7 @@ public class CourseServiceImpl implements CourseService {
 
     private User getAuthenticatedUserDetails() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return this.userRepository.findByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Can't find user with name: %s", userDetails.getUsername())));
+        return userService.findUserByName(userDetails.getUsername());
     }
 
     private boolean isCourseRegistered(Course course) {
