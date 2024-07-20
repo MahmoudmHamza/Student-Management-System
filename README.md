@@ -4,7 +4,7 @@
 
 Student management system service is built to help students view and manage courses. 
 
-**Provided operations include:**
+**Provided functionalities:**
 
 - Login using username and password.
 - Get course details by id.
