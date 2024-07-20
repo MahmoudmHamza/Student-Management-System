@@ -1,6 +1,5 @@
 package com.hamza.student_management_system.user.services;
 
-import com.hamza.student_management_system.core.exceptions.UnauthorizedException;
 import com.hamza.student_management_system.core.security.RefreshTokenService;
 import com.hamza.student_management_system.core.security.entities.RefreshToken;
 import com.hamza.student_management_system.core.security.requests.AuthRequest;
@@ -12,10 +11,7 @@ import com.hamza.student_management_system.user.datamodels.UserDto;
 import com.hamza.student_management_system.user.facade.interfaces.UserFacade;
 import com.hamza.student_management_system.user.services.interfaces.AuthenticationService;
 import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -71,7 +67,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
             if (!jwtService.validateToken(refreshAuthRequest.getRefreshToken(), userDetailsService.loadUserByUsername(username))) {
                 this.refreshTokenService.removeByToken(refreshAuthRequest.getRefreshToken());
-                throw new UnauthorizedException("Session expired, you need to login again!");
+                throw new UsernameNotFoundException("Session expired, you need to login again!");
             }
 
             return AuthResponse.builder()
@@ -82,7 +78,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         } catch (ExpiredJwtException ex) {
             this.refreshTokenService.removeByToken(refreshAuthRequest.getRefreshToken());
-            throw new UnauthorizedException("Session expired, you need to login again!");
+            throw new UsernameNotFoundException("Session expired, you need to login again!");
         }
     }
 

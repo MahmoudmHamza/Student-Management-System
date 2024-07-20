@@ -2,7 +2,6 @@ package com.hamza.student_management_system.core.aop;
 
 import com.hamza.student_management_system.core.exceptions.ApiErrorResponse;
 import com.hamza.student_management_system.core.exceptions.CourseRegistrationException;
-import com.hamza.student_management_system.core.exceptions.UnauthorizedException;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.log4j.Log4j2;
@@ -25,12 +24,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ApiErrorResponse> handleEntityNotFoundException(EntityNotFoundException exception) {
         return this.logAndRespond(HttpStatus.NOT_FOUND, exception.getMessage());
-    }
-
-    //TODO: consider remove this
-    @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<ApiErrorResponse> handleNotAuthorizedException(UnauthorizedException exception) {
-        return this.logAndRespond(HttpStatus.UNAUTHORIZED, exception.getMessage());
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
