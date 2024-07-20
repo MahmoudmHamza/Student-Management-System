@@ -6,6 +6,7 @@ import com.hamza.student_management_system.user.services.interfaces.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -31,11 +32,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User createUser(User newUser) {
-        log.info("Creating new user");
+        log.info("Creating new user with name {} {}", newUser.getFirstName(), newUser.getLastName());
         return userRepository.save(newUser);
     }
 
     @Override
+    @CacheEvict(value = "userDetails", key = "#id")
     public User deleteUser(Long id) {
         log.info(String.format("Delete user with id: %d", id));
         User deletedUser = this.findUserById(id);

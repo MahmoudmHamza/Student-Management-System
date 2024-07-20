@@ -15,6 +15,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -34,7 +35,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final UserFacade userFacade;
 
     @Override
-    @CacheEvict(value = {"userCourses", "userDetails"})
     public AuthResponse authenticate(AuthRequest authRequest) {
 
         try {

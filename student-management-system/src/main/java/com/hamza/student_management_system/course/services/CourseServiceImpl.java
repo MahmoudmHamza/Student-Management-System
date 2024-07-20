@@ -15,6 +15,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -43,7 +44,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    @Cacheable(value = "userCourses")
+    @CachePut(value = "userCourses")
     public List<Course> findCoursesByUserId() {
         User user = this.getAuthenticatedUserDetails();
         log.info(String.format("Fetching registered course for user with id: %s", user.getId()));
@@ -66,7 +67,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     @Transactional
-    @CacheEvict(value = "userCourses")
+    @CachePut(value = "userCourses")
     public Course registerCourse(Long courseId) {
         User user = getAuthenticatedUserDetails();
         Course course = this.findCourseById(courseId);
@@ -91,7 +92,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     @Transactional
-    @CacheEvict(value = "userCourses")
+    @CachePut(value = "userCourses")
     public void cancelCourseRegistration(Long courseId) {
         User user = getAuthenticatedUserDetails();
         Course course = this.findCourseById(courseId);
