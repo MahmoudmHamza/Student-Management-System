@@ -19,20 +19,6 @@ public class LogAspect {
 
     }
 
-    @Pointcut("execution(* com.hamza.student_management_system.user.services..*(..))")
-    void allUserServices() {
-
-    }
-
-    @Around("allUserServices()")
-    Object logAroundUserService(ProceedingJoinPoint joinPoint) throws Throwable {
-        long start = System.currentTimeMillis();
-        Object result = joinPoint.proceed();
-        long elapsedTime = System.currentTimeMillis() - start;
-        log.info(String.format("Executed method %s execution time: %d milliseconds.", joinPoint.getSignature().getName(), elapsedTime));
-        return result;
-    }
-
     @Around("allCourseServices()")
     Object logAroundCourseService(ProceedingJoinPoint joinPoint) throws Throwable {
         long start = System.currentTimeMillis();
