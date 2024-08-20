@@ -1,6 +1,5 @@
 package com.hamza.student_management_system.course.entities;
 
-import com.hamza.student_management_system.course.entities.Course;
 import com.hamza.student_management_system.user.entities.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
